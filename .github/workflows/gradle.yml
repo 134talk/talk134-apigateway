@@ -64,4 +64,4 @@ jobs:
         host: api.134.works
         key: ${{ secrets.PRIVATE_KEY }}
         script_stop: true
-        script: chmod 744 $GATEWAY_SCRIPT && $GATEWAY_SCRIPT
+        script: chmod 744 ${{ env.GATEWAY_SCRIPT }} && ${{ env.GATEWAY_SCRIPT }}
