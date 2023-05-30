@@ -11,7 +11,9 @@ on:
   push:
     branches: [ "main" ]
 env:
-  GATEWAY_SCRIPT: ${{ vars.GATEWAY_HOME }}/shell/apigateway.sh
+  EC2_HOST: api.134.works
+  SERVICE_HOME: ${{ secrets.GATEWAY_HOME }}
+  SCRIPT: shell/apigateway.sh
   
 permissions:
   contents: read
@@ -34,25 +36,25 @@ jobs:
     - name: Copy jar to EC2
       uses: appleboy/scp-action@master
       with:
-        username: ${{ vars.USER }}
-        host: api.134.works
+        username: ${{ secrets.EC2_USERNAME }}
+        host: ${{ env.EC2_HOST }}
         key: ${{ secrets.PRIVATE_KEY }}
         source: "./build/libs/*.jar"
-        target: ${{ vars.GATEWAY_HOME }}
+        target: ${{ env.SERVICE_HOME }}
         strip_components: 2
     - name: Copy script to EC2
       uses: appleboy/scp-action@master
       with:
-        username: ${{ vars.USER }}
-        host: api.134.works
+        username: ${{ secrets.EC2_USERNAME }}
+        host: ${{ env.EC2_HOST }}
         key: ${{ secrets.PRIVATE_KEY }}
-        source: "shell/apigateway.sh"
-        target: ${{ vars.GATEWAY_HOME }}
+        source: ${{ env.SCRIPT }}
+        target: ${{ env.SERVICE_HOME }}
     - name: Execute Script
       uses: appleboy/ssh-action@master
       with:
-        username: ${{ vars.USER }}
-        host: api.134.works
+        username: ${{ secrets.EC2_USERNAME }}
+        host: ${{ env.EC2_HOST }}
         key: ${{ secrets.PRIVATE_KEY }}
         script_stop: true
-        script: chmod 744 ${{ env.GATEWAY_SCRIPT }} && ${{ env.GATEWAY_SCRIPT }}
+        script: chmod 744 ${{ env.SERVICE_HOME }}/${{ env.SCRIPT }} && ${{ env.SERVICE_HOME }}/${{ env.SCRIPT }}
