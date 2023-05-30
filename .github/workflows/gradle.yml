@@ -46,7 +46,7 @@ jobs:
         host: api.134.works
         key: ${{ secrets.PRIVATE_KEY }}
         source: "shell/apigateway.sh"
-        target: ${{ vars.GATEWAY_HOME }}
+        target: ${{ vars.GATEWAY_HOME }}/apigateway.sh
     - name: Execute Script
       uses: appleboy/ssh-action@master
       with:
@@ -54,4 +54,4 @@ jobs:
         host: api.134.works
         key: ${{ secrets.PRIVATE_KEY }}
         script_stop: true
-        script: ${{ vars.GATEWAY_SCRIPT }}
+        script: chmod 744 ${{ vars.GATEWAY_HOME }}/apigateway.sh && ${{ vars.GATEWAY_HOME }}/apigateway.sh
