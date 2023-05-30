@@ -10,7 +10,9 @@ name: API Gateway CI/CD
 on:
   push:
     branches: [ "main" ]
-
+env:
+  GATEWAY_SCRIPT: ${{ vars.GATEWAY_HOME }}/shell/apigateway.sh
+  
 permissions:
   contents: read
 
@@ -24,6 +26,15 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |  
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
     - run: chmod +x ./gradlew
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
@@ -45,7 +56,7 @@ jobs:
         host: api.134.works
         key: ${{ secrets.PRIVATE_KEY }}
         source: "shell/apigateway.sh"
-        target: ${{ vars.GATEWAY_HOME }}/apigateway.sh
+        target: ${{ vars.GATEWAY_HOME }}
     - name: Execute Script
       uses: appleboy/ssh-action@master
       with:
@@ -53,4 +64,4 @@ jobs:
         host: api.134.works
         key: ${{ secrets.PRIVATE_KEY }}
         script_stop: true
-        script: chmod 744 ${{ vars.GATEWAY_HOME }}/apigateway.sh && ${{ vars.GATEWAY_HOME }}/apigateway.sh
+        script: chmod 744 $GATEWAY_SCRIPT && $GATEWAY_SCRIPT
