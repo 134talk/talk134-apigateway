@@ -34,10 +34,10 @@ spring:
           preLogger: true
           postLogger: true
       routes:
-      - id: talk134-user-service
+      - id: talk134-auth-service
         uri: lb://USER-SERVICE
         predicates:
-        - Path=/user/login
+        - Path=/auth/**
       - id: talk134-user-service
         uri: lb://USER-SERVICE
         predicates:
