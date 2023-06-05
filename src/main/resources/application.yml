@@ -1,6 +1,8 @@
 server:
-  port: 8000
-  
+  port: 443
+  ssl:
+    enabled: true
+
 eureka:
   client:
     fetch-registry: true
@@ -47,8 +49,7 @@ spring:
         - Path=/chat/**
         filters:
         - JwtAuthenticationFilter
-      
-        
+
 logging:
   logback:
     rollingpolicy:
@@ -62,3 +63,12 @@ logging:
     file: "[%d{HH:mm:ss.SSS}][%-5level][%t][%logger.%method:line%line] - %msg%n"
   file:
     name: "/tmp/logs/134talk/apigateway.log"
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+server:
+  port: 8000
+  ssl:
+    enabled: false
