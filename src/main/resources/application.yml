@@ -1,7 +1,7 @@
 server:
-  port: 8443
+  port: 8000
   ssl:
-    enabled: true
+    enabled: false
 
 eureka:
   client:
@@ -18,7 +18,7 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: 
+            allowedOrigins:
               - https://134.works
               - http://localhost:3000
               - http://127.0.0.1:3000
@@ -28,7 +28,8 @@ spring:
               - GET
               - PUT
               - DELETE
-              - OPTIONS # preflight 
+              - OPTIONS # preflight
+            allowCredentials: true
       default-filters:
       - name: GlobalFilter
         args:
