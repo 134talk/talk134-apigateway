@@ -1,7 +1,7 @@
 server:
-  port: 8000
+  port: 8443
   ssl:
-    enabled: false
+    enabled: true
 
 eureka:
   client:
