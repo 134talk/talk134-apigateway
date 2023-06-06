@@ -1,78 +1,19 @@
-server:
-  port: 8443
-  ssl:
-    enabled: true
-
-eureka:
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka  
-  
-spring:
-  application:
-    name: apigateway
-  cloud:
-    gateway:
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins:
-              - https://134.works
-              - http://localhost:3000
-              - http://127.0.0.1:3000
-            allowedHeaders: "*"
-            allowedMethods:
-              - POST
-              - GET
-              - PUT
-              - DELETE
-              - OPTIONS # preflight
-            allowCredentials: true
-      default-filters:
-      - name: GlobalFilter
-        args:
-          baseMessage: Spring Cloud Gateway GlobalFilter
-          preLogger: true
-          postLogger: true
-      routes:
-      - id: talk134-auth-service
-        uri: lb://USER-SERVICE
-        predicates:
-        - Path=/auth/**
-      - id: talk134-user-service
-        uri: lb://USER-SERVICE
-        predicates:
-        - Path=/user/**
-        filters:
-        - JwtAuthenticationFilter
-      - id: talk134-chat-service
-        uri: lb://CHAT-SERVICE
-        predicates:
-        - Path=/chat/**
-        filters:
-        - JwtAuthenticationFilter
-
-logging:
-  logback:
-    rollingpolicy:
-      max-file-size: 100MB
-      max-history: 7
-  level:
-    root: INFO
-    '[kr.co.talk.filter]': DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [%4L] - %m%n"
-    file: "[%d{HH:mm:ss.SSS}][%-5level][%t][%logger.%method:line%line] - %msg%n"
-  file:
-    name: "/tmp/logs/134talk/apigateway.log"
----
 spring:
   config:
-    activate:
-      on-profile: local
-server:
-  port: 8000
-  ssl:
-    enabled: false
+    import: optional:configserver:http://13.124.204.48:8081
+  application:
+    name: apigateway
+  profiles:
+    active: default
+
+  cloud:
+    bus:
+      enabled: true
+      refresh:
+        enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, busrefresh
