@@ -17,3 +17,13 @@ management:
     web:
       exposure:
         include: refresh, busrefresh
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+server:
+  port: 8000
+  ssl:
+    enabled: false
