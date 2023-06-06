@@ -45,6 +45,7 @@ public class JwtAuthenticationFilter
             }
 
             String token = authorizationHeader.split("Bearer ")[1].trim();
+            log.info("token info :: {}", token);
 
             // 토근 유효성 통과 안됐을시 예외 발생, userId 가져옴
             String subject = jwtTokenProvider.getAccessTokenSubject(token);
