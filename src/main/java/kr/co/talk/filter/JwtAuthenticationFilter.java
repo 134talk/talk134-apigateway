@@ -52,8 +52,17 @@ public class JwtAuthenticationFilter
             log.info("subject:: {} ", subject);
 
             // header에 userId 추가
-            exchange.getRequest().mutate().header(USER_ID, subject); 
-            return chain.filter(exchange);
+//            exchange.getRequest().mutate().header(USER_ID, subject);
+//            return chain.filter(exchange);
+            ServerHttpRequest serverHttpRequest = exchange.getRequest().mutate()
+                    .header(USER_ID, subject)
+                    .build();
+            ServerWebExchange webExchange = exchange.mutate()
+                    .request(serverHttpRequest)
+                    .build();
+            log.info("header USER_ID :: {}", webExchange.getRequest().getHeaders().get(USER_ID));
+
+            return chain.filter(webExchange);
         };
     }
 
