@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -70,7 +71,7 @@ public class JwtAuthenticationFilter
             log.info("header USER_ID :: {}", webExchange.getRequest().getHeaders().get(USER_ID));
 
             // 로그아웃 API일때 redis에 액세스토큰 블랙리스트 등록
-            if (request.getPath().toString().equals(LOGOUT_PATH)) {
+            if (request.getPath().toString().equals(LOGOUT_PATH) && request.getMethod() == HttpMethod.POST) {
                 long leftExpirationMillis = jwtTokenProvider.getLeftExpirationMillis(token);
                 logoutRedisService.blockAccessToken(token, leftExpirationMillis);
             }
