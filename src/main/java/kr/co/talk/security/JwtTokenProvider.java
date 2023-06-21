@@ -1,6 +1,7 @@
 package kr.co.talk.security;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Date;
 import java.util.UUID;
 
@@ -21,17 +22,15 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class JwtTokenProvider {
-//    private Key accessTokenKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-//    private Key refreshTokenKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     @Value("${jwt.accessToken.secretKey}")
     private String accessTokenKey;
 
     @Value("${jwt.refreshToken.secretKey}")
     private String refreshTokenKey;
 
-    private long tokenValidTime = 1000L * 60 * 30; // 30분
+    private final long tokenValidTime = Duration.ofMinutes(30).toMillis(); // 30분
 
-    private long refreshTokenValidTime = 1000L * 60 * 60 * 24 * 15; // 15일
+    private final long refreshTokenValidTime = Duration.ofDays(15).toMillis(); // 15일
 
     // Jwt 토큰 생성
     public String createAccessToken(String userId) {
@@ -65,19 +64,9 @@ public class JwtTokenProvider {
         return parseClaims(token, accessTokenKey).getSubject();
     }
 
-    // subject 값 조회
-    public String getRefreshTokenSubject(String token) {
-        return parseClaims(token, refreshTokenKey).getSubject();
-    }
-
     // accessToken 유효성 체크
     public void validAccessToken(String token) {
         parseClaims(token, accessTokenKey);
-    }
-
-    // refreshToken 유효성 체크
-    public void validRefreshToken(String refreshToken) {
-        parseClaims(refreshToken, refreshTokenKey);
     }
 
     private Claims parseClaims(String token, String secretKey) {
@@ -94,5 +83,20 @@ public class JwtTokenProvider {
             log.info("jwtException :: {}", jwtException.getClass());
             throw jwtException;
         }
+    }
+
+    /**
+     * JWT 토큰의 남은 유효기간을 밀리세컨드 단위로 리턴.
+     * @param accessToken 액세스 토큰
+     * @return 남은 유효기간 ms
+     */
+    public long getLeftExpirationMillis(String accessToken) {
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(accessTokenKey.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody().getExpiration();
+        // 만료기간 date에서 현재 date 뺀만큼 ms
+        return expiration.getTime() - new Date().getTime();
     }
 }
